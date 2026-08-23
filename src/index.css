@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+@theme {
+	--font-sans: "Avenir Next", "Segoe UI", sans-serif;
+}
+
+body {
+	margin: 0;
+	min-width: 320px;
+}
+
+@keyframes flower-fall {
+	0% {
+		opacity: 0;
+		transform: translateY(-2rem) rotate(0deg);
+	}
+	15% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+		transform: translateY(24rem) rotate(320deg);
+	}
+}
+
+.flower-fall {
+	animation-name: flower-fall;
+	animation-timing-function: ease-in;
+	animation-fill-mode: both;
+}
