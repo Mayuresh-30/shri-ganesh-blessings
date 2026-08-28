@@ -21,6 +21,7 @@ function GaneshPage() {
   const navigate = useNavigate()
   const [wish, setWish] = useState('')
   const [shower, setShower] = useState([])
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [ganeshName] = useState(() => ganeshRepresentations[Math.floor(Math.random() * ganeshRepresentations.length)])
 
   function releaseFlowers(flower) {
@@ -32,18 +33,50 @@ function GaneshPage() {
     }, 4500)
   }
 
-  function handleBlessing(event) {
+  async function handleBlessing(event) {
     event.preventDefault()
     const trimmedWish = wish.trim()
+
+    if (isSubmitting) {
+      return
+    }
 
     if (!trimmedWish) {
       window.alert('Please enter a wish before receiving your blessing.')
       return
     }
 
-    navigate('/blessings', {
-      state: { name: state?.name || '', wish: trimmedWish, ganeshName },
-    })
+    setIsSubmitting(true)
+
+    try {
+      const result = await fetch('/api/blessings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userName: state?.name || '',
+          userWish: trimmedWish,
+          ganeshName,
+        }),
+      })
+      const data = await result.json()
+
+      if (!result.ok) {
+        throw new Error(data.error || 'Unable to receive blessing')
+      }
+
+      navigate('/blessings', {
+        state: {
+          name: state?.name || '',
+          wish: trimmedWish,
+          ganeshName,
+          bappaResponse: data.message,
+        },
+      })
+    } catch (error) {
+      window.alert(error.message || 'Unable to receive blessing. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -96,6 +129,7 @@ function GaneshPage() {
 
           <button
             type="submit"
+            disabled={isSubmitting}
             className="mt-7 w-full rounded-xl bg-[#9f2f18] px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-[#842512] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
           >
             <span className="inline-flex items-center justify-center gap-2">
