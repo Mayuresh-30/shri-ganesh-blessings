@@ -1,10 +1,14 @@
+import { motion } from 'motion/react'
 import { useLocation } from 'react-router-dom'
 import { MessageCircle, Share2 } from 'lucide-react'
+import { getGaneshImage } from '../data/ganeshImages'
+
+const selectedImageStorageKey = 'shri-ganesh-selected-image'
 
 function BlessingPage() {
   const { state } = useLocation()
   const bappaResponse = state?.bappaResponse || 'Your blessing is being prepared.'
-  const bappaName = state?.ganeshName || 'Ganapati'
+  const ganeshImage = getGaneshImage(state?.ganeshImageId || window.sessionStorage.getItem(selectedImageStorageKey))
   const shareUrl = `${window.location.origin}/`
   const shareText = 'Share Shri Ganesh Blessings with your friends and help them find success, peace, and blessings.'
 
@@ -32,20 +36,49 @@ function BlessingPage() {
 
   return (
     <section className="mx-auto max-w-3xl text-center">
-      <p className="text-sm font-semibold uppercase tracking-[0.18em] text-orange-600">Your blessing</p>
-      <h1 className="mt-4 text-4xl font-semibold tracking-tight text-stone-950 sm:text-5xl">
-        {state?.name ? `A message for ${state.name}` : 'A message from Bappa'}
-      </h1>
-      <div className="mt-10 overflow-hidden rounded-[2rem] border border-orange-200 bg-[#fff3df] p-4 shadow-xl shadow-orange-950/10 sm:p-7">
-        <div className="flex min-h-[260px] items-center justify-center rounded-2xl bg-[#f3d4a4] text-8xl text-[#9f2f18] sm:min-h-[340px] sm:text-9xl">
-          <span className="select-none" aria-label={`Placeholder for ${bappaName} image`}>ॐ</span>
-        </div>
-        <div className="mt-6 rounded-2xl bg-white px-6 py-7 text-left shadow-sm sm:px-8">
+      <motion.div
+        initial={{ opacity: 0, y: 18 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+      >
+        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-orange-600">Your blessing</p>
+        <h1 className="mt-4 text-4xl font-semibold tracking-tight text-stone-950 sm:text-5xl">
+          {state?.name ? `A message for ${state.name}` : 'A message from Bappa'}
+        </h1>
+      </motion.div>
+
+      <motion.div
+        className="mt-10 overflow-hidden rounded-[2rem] border border-orange-200 bg-[#fff3df] p-4 shadow-xl shadow-orange-950/10 sm:p-7"
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.9, delay: 0.18, ease: [0.25, 0.1, 0.25, 1] }}
+      >
+        <motion.div
+          className="ganesh-image-stage flex min-h-[260px] items-center justify-center overflow-hidden rounded-2xl text-8xl text-[#9f2f18] sm:min-h-[340px] sm:text-9xl"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1.1, delay: 0.42, ease: [0.25, 0.1, 0.25, 1] }}
+        >
+          <img src={ganeshImage.src} alt="Shri Ganesh" className="h-full max-h-[320px] w-full object-contain" />
+        </motion.div>
+
+        <motion.div
+          className="mt-6 rounded-2xl bg-white px-6 py-7 text-left shadow-sm sm:px-8"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
+        >
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-orange-600">Bappa says</p>
           <p className="mt-4 text-xl leading-9 text-stone-700">{bappaResponse}</p>
-        </div>
-      </div>
-      <div className="mt-10 border-t border-orange-100 pt-7">
+        </motion.div>
+      </motion.div>
+
+      <motion.div
+        className="mt-10 border-t border-orange-100 pt-7"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.9, ease: [0.25, 0.1, 0.25, 1] }}
+      >
         <p className="text-sm font-medium text-stone-700">Share this link with your friends to help them find success and blessings.</p>
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
           <button
@@ -79,7 +112,7 @@ function BlessingPage() {
             </span>
           </button>
         </div>
-      </div>
+      </motion.div>
     </section>
   )
 }

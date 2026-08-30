@@ -1,9 +1,19 @@
+import { motion } from 'motion/react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowRight, Sparkles } from 'lucide-react'
+import { ganeshImages, shuffleImages } from '../data/ganeshImages'
+
+const selectedImageStorageKey = 'shri-ganesh-selected-image'
 
 function WelcomePage() {
   const [name, setName] = useState('')
+  const [{ displayedImages, selectedImageId }] = useState(() => {
+    const displayedImages = shuffleImages(ganeshImages).slice(0, 4)
+    const selectedImage = displayedImages[Math.floor(Math.random() * displayedImages.length)]
+
+    return { displayedImages, selectedImageId: selectedImage.id }
+  })
   const navigate = useNavigate()
 
   function handleSubmit(event) {
@@ -15,31 +25,57 @@ function WelcomePage() {
     }
 
     const firstName = trimmedName.split(/\s+/)[0]
-    navigate('/ganesh', { state: { name: firstName } })
+    window.sessionStorage.setItem(selectedImageStorageKey, selectedImageId)
+    navigate('/ganesh', { state: { name: firstName, ganeshImageId: selectedImageId } })
   }
 
   return (
-    <section className="mx-auto max-w-3xl py-6 text-center sm:py-10">
-      <div className="relative overflow-hidden rounded-[2rem] bg-[#9f2f18] px-6 py-14 text-orange-50 shadow-xl shadow-orange-950/10 sm:px-12 sm:py-20">
-        <div className="absolute -right-16 -top-20 h-52 w-52 rounded-full border border-orange-200/20" aria-hidden="true" />
-        <div className="absolute -bottom-28 -left-16 h-64 w-64 rounded-full border border-orange-200/20" aria-hidden="true" />
-        <p className="relative text-sm font-semibold uppercase tracking-[0.28em] text-orange-200">A moment of devotion</p>
-        <h1 className="relative mt-5 text-4xl font-semibold tracking-tight sm:text-6xl">Welcome to Shri Ganesh Blessings</h1>
-        <p className="relative mx-auto mt-5 max-w-xl text-base leading-7 text-orange-100 sm:text-lg">
-          Take a quiet moment to connect with Lord Ganesha and receive a blessing for the path ahead.
-        </p>
-      </div>
-
-      <form onSubmit={handleSubmit} className="mx-auto mt-8 max-w-xl rounded-2xl border border-orange-100 bg-white p-6 text-left shadow-lg shadow-orange-950/5 sm:mt-10 sm:p-8">
-        <div className="flex items-center justify-between border-b border-orange-100 pb-4">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-orange-600">Your journey</p>
-            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-stone-950">Let us know your name</h2>
-          </div>
-          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-100 text-xl text-orange-700" aria-hidden="true">ॐ</span>
+    <section className="mx-auto max-w-5xl py-6 text-center sm:py-10">
+      <div className="hero-banner-shell">
+        <div className="hero-panel-grid">
+          {displayedImages.map((image, index) => (
+            <motion.div
+              key={image.id}
+              className="hero-panel"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.7, delay: index * 0.12, ease: 'easeOut' }}
+            >
+              <motion.img
+                src={image.src}
+                alt="Shri Ganesh"
+                className="hero-panel-image"
+                initial={{ opacity: 0, filter: 'grayscale(1) brightness(0.42) contrast(1.18)' }}
+                animate={{ opacity: 0.38, filter: 'grayscale(1) brightness(0.52) contrast(1.18)' }}
+                whileHover={{
+                  opacity: 1,
+                  filter: 'grayscale(0) brightness(1.05) contrast(1.12)',
+                }}
+                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+              />
+            </motion.div>
+          ))}
         </div>
 
-        <label htmlFor="name" className="mt-7 block text-sm font-medium text-stone-700">Your beautiful name</label>
+        <div className="hero-overlay-copy">
+          <p className="hero-subtitle">A moment of devotion</p>
+          <h1 className="hero-title">Welcome to Shri Ganesh Blessings</h1>
+          <p className="hero-description">
+            Take a quiet moment to connect with Lord Ganesh and receive a blessing for the path ahead.
+          </p>
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit} className="mx-auto mt-8 max-w-xl rounded-2xl border border-[#f0b255] bg-[#d75b2a] p-6 text-left shadow-lg shadow-[#4a2b26]/15 sm:mt-10 sm:p-8">
+        <div className="flex items-center justify-between border-b border-[#d8a58d] pb-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#f8e4d1]">Your journey</p>
+            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[#fffaf5]">Let us know your name</h2>
+          </div>
+          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f3e1c9] text-xl text-[#7a332f]" aria-hidden="true">ॐ</span>
+        </div>
+
+        <label htmlFor="name" className="mt-7 block text-sm font-medium text-[#f7e7db]">Your beautiful name</label>
         <input
           id="name"
           type="text"
@@ -47,19 +83,47 @@ function WelcomePage() {
           onChange={(event) => setName(event.target.value)}
           placeholder="Enter your name"
           autoComplete="name"
-          className="mt-2 w-full rounded-lg border border-stone-200 bg-[#fffdfa] px-4 py-3 text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-orange-500 focus:ring-2 focus:ring-orange-200"
+          className="mt-2 w-full rounded-lg border border-[#d8a58d] bg-[#fff8f4] px-4 py-3 text-[#2b1d1b] outline-none transition placeholder:text-[#8b7168] focus:border-[#f0d9c0] focus:ring-2 focus:ring-[#f5d7b8]"
         />
-        <button
+        <motion.button
           type="submit"
           disabled={!name.trim()}
-          className="mt-6 w-full rounded-lg bg-orange-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-stone-300 disabled:text-stone-500 disabled:hover:bg-stone-300"
+          className="mt-6 w-full rounded-lg bg-[#f4c453] px-5 py-3 text-sm font-semibold text-[#4b220d] transition hover:bg-[#eab73c] focus:outline-none focus:ring-2 focus:ring-[#f9db8f] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-stone-300 disabled:text-stone-500 disabled:hover:bg-stone-300"
+          whileHover={
+            !name.trim()
+              ? undefined
+              : {
+                  scale: 1.01,
+                  y: -2,
+                  boxShadow: '0 16px 28px rgba(95, 45, 36, 0.28)',
+                }
+          }
+          whileTap={
+            !name.trim()
+              ? undefined
+              : {
+                  scale: 0.985,
+                  y: 0,
+                }
+          }
+          transition={{ type: 'spring', stiffness: 320, damping: 18 }}
         >
           <span className="inline-flex items-center justify-center gap-2">
-            <Sparkles size={17} aria-hidden="true" />
+            <motion.span
+              animate={{ rotate: [0, 8, -6, 0] }}
+              transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              <Sparkles size={17} aria-hidden="true" />
+            </motion.span>
             Continue to Shri Ganesh
-            <ArrowRight size={17} aria-hidden="true" />
+            <motion.span
+              animate={{ x: [0, 4, 0] }}
+              transition={{ duration: 1.1, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              <ArrowRight size={17} aria-hidden="true" />
+            </motion.span>
           </span>
-        </button>
+        </motion.button>
       </form>
     </section>
   )
