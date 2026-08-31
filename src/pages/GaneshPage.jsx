@@ -25,6 +25,9 @@ function GaneshPage() {
   const [wish, setWish] = useState('')
   const [shower, setShower] = useState([])
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [offeredFlowers, setOfferedFlowers] = useState([])
+
+  const isBlessable = offeredFlowers.length === flowers.length
 
   function releaseFlowers(flower) {
     const burstId = `${Date.now()}-${Math.random()}`
@@ -33,6 +36,14 @@ function GaneshPage() {
     window.setTimeout(() => {
       setShower((currentShower) => currentShower.filter(({ burstId: currentBurstId }) => currentBurstId !== burstId))
     }, 4500)
+
+    setOfferedFlowers((currentOfferedFlowers) => {
+      if (currentOfferedFlowers.includes(flower)) {
+        return currentOfferedFlowers
+      }
+
+      return [...currentOfferedFlowers, flower]
+    })
   }
 
   async function handleBlessing(event) {
@@ -145,10 +156,14 @@ function GaneshPage() {
             ))}
           </div>
 
+          <p className="mt-3 text-center text-sm font-medium text-[#7a5749]">
+            {isBlessable ? 'All flowers are offered. Bappa is ready to bless you.' : `Offer all ${flowers.length} flowers to unlock the blessing.`}
+          </p>
+
           <button
             type="submit"
-            disabled={isSubmitting}
-            className="mt-7 w-full rounded-xl bg-[#d75b2a] px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-[#c5501e] focus:outline-none focus:ring-2 focus:ring-[#f4c453] focus:ring-offset-2"
+            disabled={isSubmitting || !isBlessable}
+            className="mt-7 w-full rounded-xl bg-[#d75b2a] px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-[#c5501e] focus:outline-none focus:ring-2 focus:ring-[#f4c453] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#c7a18b]"
           >
             <span className="inline-flex items-center justify-center gap-2">
               Receive my blessing

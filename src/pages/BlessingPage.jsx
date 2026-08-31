@@ -10,28 +10,56 @@ function BlessingPage() {
   const bappaResponse = state?.bappaResponse || 'Your blessing is being prepared.'
   const ganeshImage = getGaneshImage(state?.ganeshImageId || window.sessionStorage.getItem(selectedImageStorageKey))
   const shareUrl = `${window.location.origin}/`
-  const shareText = 'Share Shri Ganesh Blessings with your friends and help them find success, peace, and blessings.'
+  const shareText = `I just received a divine blessing from Shri Ganesh. ${bappaResponse} Share the blessings with your family and friends.`
 
   function openShareWindow(url) {
     window.open(url, '_blank', 'noopener,noreferrer')
   }
 
+  async function shareWithFallback({ text, url, fallbackUrl }) {
+    const shareData = {
+      title: 'Shri Ganesh Blessings',
+      text,
+      url,
+    }
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData)
+        return
+      }
+
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(`${text} ${url}`)
+        window.alert('Share message copied to clipboard. Paste it into your social app.')
+      }
+
+      if (fallbackUrl) {
+        openShareWindow(fallbackUrl)
+      }
+    } catch (error) {
+      if (fallbackUrl) {
+        openShareWindow(fallbackUrl)
+      }
+    }
+  }
+
   function shareOnWhatsApp() {
-    openShareWindow(`https://wa.me/?text=${encodeURIComponent(`${shareText} ${shareUrl}`)}`)
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${shareText} ${shareUrl}`)}`
+    openShareWindow(whatsappUrl)
   }
 
   function shareOnFacebook() {
-    openShareWindow(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`)
+    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`
+    openShareWindow(facebookUrl)
   }
 
   async function shareOnInstagram() {
-    if (navigator.share) {
-      await navigator.share({ title: 'Shri Ganesh Blessings', text: shareText, url: shareUrl })
-      return
-    }
-
-    await navigator.clipboard?.writeText(`${shareText} ${shareUrl}`)
-    openShareWindow('https://www.instagram.com/')
+    await shareWithFallback({
+      text: shareText,
+      url: shareUrl,
+      fallbackUrl: 'https://www.instagram.com/',
+    })
   }
 
   return (
