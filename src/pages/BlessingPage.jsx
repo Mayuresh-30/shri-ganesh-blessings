@@ -10,10 +10,27 @@ function BlessingPage() {
   const bappaResponse = state?.bappaResponse || 'Your blessing is being prepared.'
   const ganeshImage = getGaneshImage(state?.ganeshImageId || window.sessionStorage.getItem(selectedImageStorageKey))
   const shareUrl = `${window.location.origin}/`
-  const shareText = `I just received a divine blessing from Shri Ganesh. ${bappaResponse} Share the blessings with your family and friends.`
+  const shareText = `I just received a divine blessing from Shri Ganesh. Click on the link below to get blessings from him & Share the blessings with your family and friends.`
 
   function openShareWindow(url) {
     window.open(url, '_blank', 'noopener,noreferrer')
+  }
+
+  function shareWithClipboardFallback({ text, url, fallbackUrl }) {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(`${text} ${url}`)
+        .then(() => {
+          window.alert('Share message copied to clipboard. Paste it into your social app.')
+        })
+        .catch(() => {
+          if (fallbackUrl) openShareWindow(fallbackUrl)
+        })
+      return
+    }
+
+    if (fallbackUrl) {
+      openShareWindow(fallbackUrl)
+    }
   }
 
   async function shareWithFallback({ text, url, fallbackUrl }) {
@@ -50,15 +67,30 @@ function BlessingPage() {
   }
 
   function shareOnFacebook() {
-    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`
-    openShareWindow(facebookUrl)
+    const facebookWebUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`
+    openShareWindow(facebookWebUrl)
   }
 
   async function shareOnInstagram() {
-    await shareWithFallback({
+    const instagramWebUrl = 'https://www.instagram.com/'
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Shri Ganesh Blessings',
+          text: shareText,
+          url: shareUrl,
+        })
+        return
+      } catch (error) {
+        // Ignore cancel/error and continue with fallback
+      }
+    }
+
+    shareWithClipboardFallback({
       text: shareText,
       url: shareUrl,
-      fallbackUrl: 'https://www.instagram.com/',
+      fallbackUrl: instagramWebUrl,
     })
   }
 
@@ -108,37 +140,37 @@ function BlessingPage() {
         transition={{ duration: 0.8, delay: 0.9, ease: [0.25, 0.1, 0.25, 1] }}
       >
         <p className="text-sm font-medium text-stone-700">Share this link with your friends to help them find success and blessings.</p>
-        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
           <button
             type="button"
             onClick={shareOnWhatsApp}
-            className="rounded-lg bg-[#25D366] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#1fb957] focus:outline-none focus:ring-2 focus:ring-[#25D366] focus:ring-offset-2"
+            className="w-full max-w-[220px] rounded-lg bg-[#25D366] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#1fb957] focus:outline-none focus:ring-2 focus:ring-[#25D366] focus:ring-offset-2 sm:w-auto"
           >
             <span className="inline-flex items-center justify-center gap-2">
               <MessageCircle size={17} aria-hidden="true" />
               WhatsApp
             </span>
           </button>
-          <button
+           {/* <button
             type="button"
             onClick={shareOnInstagram}
-            className="rounded-lg bg-[#d62976] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#b92164] focus:outline-none focus:ring-2 focus:ring-[#d62976] focus:ring-offset-2"
+            className="w-full max-w-[220px] rounded-lg bg-[#d62976] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#b92164] focus:outline-none focus:ring-2 focus:ring-[#d62976] focus:ring-offset-2 sm:w-auto"
           >
             <span className="inline-flex items-center justify-center gap-2">
               <Share2 size={17} aria-hidden="true" />
               Instagram
             </span>
-          </button>
-          <button
+          </button> */}
+          {/* <button
             type="button"
             onClick={shareOnFacebook}
-            className="rounded-lg bg-[#1877F2] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#1468d5] focus:outline-none focus:ring-2 focus:ring-[#1877F2] focus:ring-offset-2"
+            className="w-full max-w-[220px] rounded-lg bg-[#1877F2] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#1468d5] focus:outline-none focus:ring-2 focus:ring-[#1877F2] focus:ring-offset-2 sm:w-auto"
           >
             <span className="inline-flex items-center justify-center gap-2">
               <Share2 size={17} aria-hidden="true" />
               Facebook
             </span>
-          </button>
+          </button>  */}
         </div>
       </motion.div>
     </section>

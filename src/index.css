@@ -11,6 +11,53 @@ body {
 	color: #2b1d1b;
 }
 
+.duplicate-blessing-toast {
+	position: fixed;
+	top: 12%;
+	left: 50%;
+	z-index: 50;
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	width: min(680px, calc(100% - 2rem));
+	padding: 0.9rem 1.15rem;
+	transform: translate(-50%, -50%);
+	border: 1px solid rgba(255, 227, 169, 0.8);
+	border-radius: 1rem;
+	background: rgba(102, 43, 31, 0.96);
+	box-shadow: 0 16px 35px rgba(58, 25, 17, 0.24);
+	color: #fff8eb;
+	font-size: 0.95rem;
+	font-weight: 600;
+	line-height: 1.45;
+	text-align: left;
+	overflow-wrap: anywhere;
+	backdrop-filter: blur(12px);
+}
+
+.duplicate-blessing-toast__mark {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	width: 2rem;
+	height: 2rem;
+	border-radius: 999px;
+	background: #f4c453;
+	color: #5e2b1b;
+	font-size: 1.15rem;
+}
+
+@media (max-width: 640px) {
+	.duplicate-blessing-toast {
+		top: 12%;
+		width: min(680px, calc(100vw - 1.5rem));
+		padding: 0.8rem 0.9rem;
+		font-size: 0.86rem;
+	}
+}
+
 .ganesh-card {
 	background: #f9f0cf;
 	border: 1px solid rgba(168, 101, 35, 0.12);
@@ -91,6 +138,14 @@ body {
 	filter: grayscale(1) brightness(0.52) contrast(1.18);
 }
 
+.hero-mobile-image-wrap {
+	display: none;
+}
+
+.hero-mobile-image {
+	display: none;
+}
+
 .hero-overlay-copy {
 	position: absolute;
 	inset: 0;
@@ -135,19 +190,35 @@ body {
 }
 
 @media (max-width: 640px) {
-	.hero-panel-grid {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		min-height: 300px;
+	.hero-banner-shell {
+		min-height: 260px;
+		background:
+			linear-gradient(90deg, rgba(43, 10, 15, 0.98) 0%, rgba(95, 27, 34, 0.96) 38%, rgba(67, 18, 23, 0.98) 100%),
+			rgba(52, 17, 20, 0.96);
 	}
 
-	.hero-panel {
-		min-height: 160px;
+	.hero-banner-shell::before {
+		background: linear-gradient(
+			120deg,
+			rgba(255, 246, 220, 0) 18%,
+			rgba(255, 246, 220, 0.06) 29%,
+			rgba(243, 201, 103, 0.32) 41%,
+			rgba(222, 161, 67, 0.38) 50%,
+			rgba(243, 201, 103, 0.2) 60%,
+			rgba(255, 246, 220, 0.06) 70%,
+			rgba(255, 246, 220, 0) 80%
+		);
+		opacity: 0.6;
 	}
 
-	.hero-panel-label {
-		bottom: 18%;
-		font-size: 0.8rem;
-		padding: 0.45rem 0.7rem;
+	.hero-panel-grid--desktop {
+		display: none;
+	}
+
+	.hero-overlay-copy {
+		position: absolute;
+		inset: 0;
+		padding-top: 2rem;
 	}
 
 	.hero-title {

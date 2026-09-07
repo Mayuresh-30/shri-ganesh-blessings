@@ -1,13 +1,15 @@
 import { motion } from 'motion/react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import React from 'react';
 import { ArrowRight, Sparkles } from 'lucide-react'
 import { ganeshImages, shuffleImages } from '../data/ganeshImages'
+import { persistentStorageKeys, usePersistentValue } from '../functions/usePersistentValue'
 
 const selectedImageStorageKey = 'shri-ganesh-selected-image'
 
 function WelcomePage() {
-  const [name, setName] = useState('')
+  const [name, setName] = usePersistentValue(persistentStorageKeys.name)
   const [{ displayedImages, selectedImageId }] = useState(() => {
     const displayedImages = shuffleImages(ganeshImages).slice(0, 4)
     const selectedImage = displayedImages[Math.floor(Math.random() * displayedImages.length)]
@@ -32,7 +34,7 @@ function WelcomePage() {
   return (
     <section className="mx-auto max-w-5xl py-6 text-center sm:py-10">
       <div className="hero-banner-shell">
-        <div className="hero-panel-grid">
+        <div className="hero-panel-grid hero-panel-grid--desktop">
           {displayedImages.map((image, index) => (
             <motion.div
               key={image.id}

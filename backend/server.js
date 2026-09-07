@@ -28,42 +28,113 @@ app.use('/api', rateLimit({
   max: 100,
 }))
 
+function isUuid(value) {
+  return typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
+}
+
+function blessingPayload(blessing) {
+  return {
+    userId: blessing.user_id,
+    name: blessing.user_name,
+    wish: blessing.user_wish,
+    ganeshImageId: blessing.ganesh_name,
+    bappaResponse: blessing.bappa_response,
+  }
+}
+
 app.post('/api/blessings', async (request, response) => {
+  let connection
+
   try {
-    const { userName, userWish, ganeshName } = request.body
+    const { userId, userName, userWish, ganeshName } = request.body
 
     if (
+      !isUuid(userId) ||
       typeof userName !== 'string' ||
       typeof userWish !== 'string' ||
       !userName.trim() ||
       !userWish.trim()
     ) {
       return response.status(400).json({
-        error: 'Name and wish are required.',
+        error: 'A valid user ID, name, and wish are required.',
       })
     }
 
     const cleanName = userName.trim().slice(0, 80)
     const cleanWish = userWish.trim().slice(0, 500)
     const cleanGaneshName = ganeshName || 'Ganapati'
+    connection = await database.getConnection()
+    await connection.beginTransaction()
+
+    const [existingBlessings] = await connection.execute(
+      `SELECT user_id, user_name, user_wish, bappa_response, ganesh_name
+       FROM blessings
+       WHERE user_id = ?
+       LIMIT 1
+       FOR UPDATE`,
+      [userId],
+    )
+
+    if (existingBlessings.length > 0) {
+      await connection.rollback()
+
+      return response.status(409).json({
+        code: 'ALREADY_BLESSED',
+        error: 'This user has already received a blessing.',
+        blessing: blessingPayload(existingBlessings[0]),
+      })
+    }
+
     const bappaResponse = createBappaResponse(cleanWish)
 
-    await database.execute(
+    await connection.execute(
       `INSERT INTO blessings
-       (user_name, user_wish, bappa_response, ganesh_name)
-       VALUES (?, ?, ?, ?)`,
-      [cleanName, cleanWish, bappaResponse, cleanGaneshName],
+       (user_id, user_name, user_wish, bappa_response, ganesh_name)
+       VALUES (?, ?, ?, ?, ?)`,
+      [userId, cleanName, cleanWish, bappaResponse, cleanGaneshName],
     )
+
+    await connection.commit()
 
     return response.status(201).json({
       message: bappaResponse,
+      userId,
+      replayed: false,
     })
   } catch (error) {
+    if (connection) {
+      await connection.rollback()
+    }
+
+    if (error.code === 'ER_DUP_ENTRY') {
+      try {
+        const [existingBlessings] = await database.execute(
+          `SELECT user_id, user_name, user_wish, bappa_response, ganesh_name
+           FROM blessings
+           WHERE user_id = ?
+           LIMIT 1`,
+          [request.body.userId],
+        )
+
+        if (existingBlessings.length > 0) {
+          return response.status(409).json({
+            code: 'ALREADY_BLESSED',
+            error: 'This user has already received a blessing.',
+            blessing: blessingPayload(existingBlessings[0]),
+          })
+        }
+      } catch (lookupError) {
+        console.error(lookupError)
+      }
+    }
+
     console.error(error)
 
     return response.status(500).json({
       error: 'Unable to save blessing.',
     })
+  } finally {
+    connection?.release()
   }
 })
 
