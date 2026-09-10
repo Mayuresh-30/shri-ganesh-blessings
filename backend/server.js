@@ -1,13 +1,24 @@
-import 'dotenv/config'
+import dotenv from 'dotenv'
 import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
 import mysql from 'mysql2/promise'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { createBappaResponse } from './responseGenerator.js'
+
+const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
+dotenv.config({ path: resolve(projectRoot, '.env') })
 
 const app = express()
 const port = process.env.PORT || 3000
+const requiredDatabaseEnvironment = ['DB_HOST', 'DB_USER', 'DB_PASSWORD', 'DB_NAME']
+const missingDatabaseEnvironment = requiredDatabaseEnvironment.filter((key) => !process.env[key])
+
+if (missingDatabaseEnvironment.length > 0) {
+  throw new Error(`Missing database environment variables: ${missingDatabaseEnvironment.join(', ')}`)
+}
 
 const database = mysql.createPool({
   host: process.env.DB_HOST,

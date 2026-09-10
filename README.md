@@ -1,4 +1,11 @@
-# React + Vite
+# Shri Ganesh Blessings
+
+The project is organized as two applications:
+
+- `frontend/` contains the React/Vite application and static assets.
+- `backend/` contains the Express API and its production dependencies.
+
+Install all workspace dependencies from the repository root with `npm install`. Start both applications with `npm run dev:full`; the frontend proxies `/api` requests to `http://localhost:3000`. Configure the backend database variables and `CLIENT_ORIGIN` expected by `backend/server.js`.
 
 This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
 
