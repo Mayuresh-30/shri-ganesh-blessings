@@ -1,6 +1,6 @@
 import { motion } from 'motion/react'
 import { useLocation } from 'react-router-dom'
-import { MessageCircle, Share2 } from 'lucide-react'
+import { MessageCircle } from 'lucide-react'
 import { getGaneshImage } from '../data/ganeshImages'
 
 const selectedImageStorageKey = 'shri-ganesh-selected-image'
@@ -16,82 +16,9 @@ function BlessingPage() {
     window.open(url, '_blank', 'noopener,noreferrer')
   }
 
-  function shareWithClipboardFallback({ text, url, fallbackUrl }) {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(`${text} ${url}`)
-        .then(() => {
-          window.alert('Share message copied to clipboard. Paste it into your social app.')
-        })
-        .catch(() => {
-          if (fallbackUrl) openShareWindow(fallbackUrl)
-        })
-      return
-    }
-
-    if (fallbackUrl) {
-      openShareWindow(fallbackUrl)
-    }
-  }
-
-  async function shareWithFallback({ text, url, fallbackUrl }) {
-    const shareData = {
-      title: 'Shri Ganesh Blessings',
-      text,
-      url,
-    }
-
-    try {
-      if (navigator.share) {
-        await navigator.share(shareData)
-        return
-      }
-
-      if (navigator.clipboard) {
-        await navigator.clipboard.writeText(`${text} ${url}`)
-        window.alert('Share message copied to clipboard. Paste it into your social app.')
-      }
-
-      if (fallbackUrl) {
-        openShareWindow(fallbackUrl)
-      }
-    } catch (error) {
-      if (fallbackUrl) {
-        openShareWindow(fallbackUrl)
-      }
-    }
-  }
-
   function shareOnWhatsApp() {
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${shareText} ${shareUrl}`)}`
     openShareWindow(whatsappUrl)
-  }
-
-  function shareOnFacebook() {
-    const facebookWebUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`
-    openShareWindow(facebookWebUrl)
-  }
-
-  async function shareOnInstagram() {
-    const instagramWebUrl = 'https://www.instagram.com/'
-
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: 'Shri Ganesh Blessings',
-          text: shareText,
-          url: shareUrl,
-        })
-        return
-      } catch (error) {
-        // Ignore cancel/error and continue with fallback
-      }
-    }
-
-    shareWithClipboardFallback({
-      text: shareText,
-      url: shareUrl,
-      fallbackUrl: instagramWebUrl,
-    })
   }
 
   return (
@@ -151,26 +78,6 @@ function BlessingPage() {
               WhatsApp
             </span>
           </button>
-           {/* <button
-            type="button"
-            onClick={shareOnInstagram}
-            className="w-full max-w-[220px] rounded-lg bg-[#d62976] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#b92164] focus:outline-none focus:ring-2 focus:ring-[#d62976] focus:ring-offset-2 sm:w-auto"
-          >
-            <span className="inline-flex items-center justify-center gap-2">
-              <Share2 size={17} aria-hidden="true" />
-              Instagram
-            </span>
-          </button> */}
-          {/* <button
-            type="button"
-            onClick={shareOnFacebook}
-            className="w-full max-w-[220px] rounded-lg bg-[#1877F2] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#1468d5] focus:outline-none focus:ring-2 focus:ring-[#1877F2] focus:ring-offset-2 sm:w-auto"
-          >
-            <span className="inline-flex items-center justify-center gap-2">
-              <Share2 size={17} aria-hidden="true" />
-              Facebook
-            </span>
-          </button>  */}
         </div>
       </motion.div>
     </section>

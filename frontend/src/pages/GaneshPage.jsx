@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
 import { getGaneshImage } from '../data/ganeshImages'
 import { getOrCreateUserId, persistentStorageKeys, usePersistentValue } from '../functions/usePersistentValue'
+import { apiPath } from '../config/api'
 import React from 'react'
 const selectedImageStorageKey = 'shri-ganesh-selected-image'
 const flowers = ['🌼', '🌸', '🌺', '🌻']
@@ -28,6 +29,7 @@ function GaneshPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [offeredFlowers, setOfferedFlowers] = useState([])
   const [duplicateBlessing, setDuplicateBlessing] = useState(null)
+  const [errorMessage, setErrorMessage] = useState('')
 
   const storedName = window.sessionStorage.getItem(persistentStorageKeys.name)
   const displayName = state?.name || storedName || ''
@@ -66,9 +68,10 @@ function GaneshPage() {
     }
 
     setIsSubmitting(true)
+    setErrorMessage('')
 
     try {
-      const result = await fetch('/api/blessings', {
+      const result = await fetch(apiPath('/api/blessings'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -98,7 +101,7 @@ function GaneshPage() {
         },
       })
     } catch (error) {
-      window.alert(error.message || 'Unable to receive blessing. Please try again.')
+      setErrorMessage(error.message || 'Unable to receive blessing. Please try again.')
     } finally {
       setIsSubmitting(false)
     }
@@ -179,8 +182,15 @@ function GaneshPage() {
             onChange={(event) => setWish(event.target.value)}
             placeholder="Enter your wish"
             rows="3"
+            maxLength="500"
             className="mt-2 w-full resize-none rounded-xl border border-[#dcc2a3] bg-[#fffdfa] px-4 py-3 text-[#2b1d1b] outline-none transition placeholder:text-[#8b7168] focus:border-[#8c4d3a] focus:ring-2 focus:ring-[#e7d2bc]"
           />
+
+          {errorMessage && (
+            <p className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800" role="alert">
+              {errorMessage}
+            </p>
+          )}
 
           <div className="mt-5 flex items-center justify-center gap-3" aria-label="Offer a flower">
             {flowers.map((flower) => (

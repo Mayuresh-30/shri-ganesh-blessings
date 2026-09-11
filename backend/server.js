@@ -13,11 +13,19 @@ dotenv.config({ path: resolve(projectRoot, '.env') })
 
 const app = express()
 const port = process.env.PORT || 3000
-const requiredDatabaseEnvironment = ['DB_HOST', 'DB_USER', 'DB_PASSWORD', 'DB_NAME']
+const requiredDatabaseEnvironment = ['DB_HOST', 'DB_USER', 'DB_PASSWORD', 'DB_NAME', 'CLIENT_ORIGIN']
 const missingDatabaseEnvironment = requiredDatabaseEnvironment.filter((key) => !process.env[key])
 
 if (missingDatabaseEnvironment.length > 0) {
   throw new Error(`Missing database environment variables: ${missingDatabaseEnvironment.join(', ')}`)
+}
+
+let clientOrigin
+
+try {
+  clientOrigin = new URL(process.env.CLIENT_ORIGIN).origin
+} catch {
+  throw new Error('CLIENT_ORIGIN must be a valid frontend URL')
 }
 
 const database = mysql.createPool({
@@ -31,13 +39,27 @@ const database = mysql.createPool({
 })
 
 app.use(helmet())
-app.use(cors({ origin: process.env.CLIENT_ORIGIN }))
+app.use(cors({ origin: clientOrigin }))
 app.use(express.json({ limit: '10kb' }))
 
 app.use('/api', rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
 }))
+
+app.get('/health', (_request, response) => {
+  response.status(200).json({ status: 'ok' })
+})
+
+app.get('/ready', async (_request, response) => {
+  try {
+    await database.query('SELECT 1')
+    response.status(200).json({ status: 'ready' })
+  } catch (error) {
+    console.error(error)
+    response.status(503).json({ status: 'not_ready' })
+  }
+})
 
 function isUuid(value) {
   return typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
@@ -149,6 +171,17 @@ app.post('/api/blessings', async (request, response) => {
   }
 })
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`API running on port ${port}`)
 })
+
+function shutdown(signal) {
+  console.log(`${signal} received; shutting down`)
+  server.close(async () => {
+    await database.end()
+    process.exit(0)
+  })
+}
+
+process.on('SIGTERM', () => shutdown('SIGTERM'))
+process.on('SIGINT', () => shutdown('SIGINT'))

@@ -1,35 +1,35 @@
 export const ganeshImages = [
   {
     id: 'ganapati-1',
-    src: '/shri-ganesh-images/hd/ganapati-1-removebg-preview-Picsart-AiImageEnhancer.png',
+    src: '/shri-ganesh-images/hd/ganapati-1-removebg-preview-Picsart-AiImageEnhancer.webp',
   },
   {
     id: 'ganapati-2',
-    src: '/shri-ganesh-images/hd/ganapati-2-removebg-preview-Picsart-AiImageEnhancer.png',
+    src: '/shri-ganesh-images/hd/ganapati-2-removebg-preview-Picsart-AiImageEnhancer.webp',
   },
   {
     id: 'ganapati-3',
-    src: '/shri-ganesh-images/hd/ganapati-3-removebg-preview-Picsart-AiImageEnhancer.png',
+    src: '/shri-ganesh-images/hd/ganapati-3-removebg-preview-Picsart-AiImageEnhancer.webp',
   },
   {
     id: 'ganapati-4',
-    src: '/shri-ganesh-images/hd/ganapati-4-removebg-preview-Picsart-AiImageEnhancer.png',
+    src: '/shri-ganesh-images/hd/ganapati-4-removebg-preview-Picsart-AiImageEnhancer.webp',
   },
   {
     id: 'ganapati-5',
-    src: '/shri-ganesh-images/hd/ganapati-5-removebg-preview-Picsart-AiImageEnhancer.png',
+    src: '/shri-ganesh-images/hd/ganapati-5-removebg-preview-Picsart-AiImageEnhancer.webp',
   },
   {
     id: 'ganapati-6',
-    src: '/shri-ganesh-images/hd/ganapati-6-removebg-preview-Picsart-AiImageEnhancer.png',
+    src: '/shri-ganesh-images/hd/ganapati-6-removebg-preview-Picsart-AiImageEnhancer.webp',
   },
   {
     id: 'dagdu-sheth',
-    src: '/shri-ganesh-images/hd/DagduShet-Halwai-removebg-preview-Picsart-AiImageEnhancer.png',
+    src: '/shri-ganesh-images/hd/DagduShet-Halwai-removebg-preview-Picsart-AiImageEnhancer.webp',
   },
   {
     id: 'lalbaug-cha-raja',
-    src: '/shri-ganesh-images/hd/Lalbag-cha-raja-removebg-preview-Picsart-AiImageEnhancer.png',
+    src: '/shri-ganesh-images/hd/Lalbag-cha-raja-removebg-preview-Picsart-AiImageEnhancer.webp',
   },
 ]
 
