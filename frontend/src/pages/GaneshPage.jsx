@@ -1,7 +1,7 @@
 import { motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, LoaderCircle } from 'lucide-react'
 import { getGaneshImage } from '../data/ganeshImages'
 import { getOrCreateUserId, persistentStorageKeys, usePersistentValue } from '../functions/usePersistentValue'
 import { apiPath } from '../config/api'
@@ -220,12 +220,27 @@ function GaneshPage() {
             type="submit"
             disabled={isSubmitting || duplicateBlessing || !canReceiveBlessing}
             className="mt-7 w-full rounded-xl bg-[#d75b2a] px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-[#c5501e] focus:outline-none focus:ring-2 focus:ring-[#f4c453] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#c7a18b]"
+            aria-busy={isSubmitting}
           >
             <span className="inline-flex items-center justify-center gap-2">
-              Receive my blessing
-              <ArrowRight size={17} aria-hidden="true" />
+              {isSubmitting ? (
+                <>
+                  <LoaderCircle className="animate-spin" size={17} aria-hidden="true" />
+                  Receiving your blessing...
+                </>
+              ) : (
+                <>
+                  Receive my blessing
+                  <ArrowRight size={17} aria-hidden="true" />
+                </>
+              )}
             </span>
           </button>
+          {isSubmitting && (
+            <p className="mt-3 text-center text-sm font-medium text-[#7a5749]" role="status" aria-live="polite">
+              Bappa is preparing your blessing. Please wait a moment.
+            </p>
+          )}
         </form>
       </motion.div>
     </section>
